@@ -1,0 +1,61 @@
+package com.bukalapak.hero.services
+
+import com.bukalapak.hero.models.Hero
+import com.bukalapak.hero.repositories.AbilityRepository
+import com.bukalapak.hero.repositories.HeroRepository
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
+import org.springframework.stereotype.Service
+
+@Service
+class HeroService {
+  @Autowired
+  HeroRepository heroRepository
+
+  @Autowired
+  AbilityRepository abilityRepository
+
+  List findAll() {
+    heroRepository.findAll(Sort.by('name')).asList()
+  }
+
+  Hero findById(long id) {
+    heroRepository.findById(id).orElse(null)
+  }
+
+  Hero save(Hero hero) {
+    // assign hero to every abilities
+    hero.abilities?.each { it.hero = hero }
+    heroRepository.save(hero)
+  }
+
+  Hero update(Hero hero, long id) {
+    Hero persisted = heroRepository.findById(id).orElseThrow()
+    persisted.with {
+      name = hero.name
+    }
+    def toBeRemoved = []
+    // find values to update & delete
+    persisted.abilities.each {
+      def a = hero.abilities.find { it2 -> it2.id == it.id }
+      if (a == null) toBeRemoved.add(it)
+      else it.name = a.name
+    }
+    persisted.abilities.removeAll(toBeRemoved)
+    // assign persisted entity as the hero
+    hero.abilities.each {
+      if (it.id == null) {
+        it.hero = persisted
+        persisted.abilities.add(it)
+      }
+    }
+
+    heroRepository.save(persisted)
+  }
+
+  Hero deleteById(long id) {
+    def hero = findById(id)
+    heroRepository.delete(hero)
+    hero
+  }
+}
