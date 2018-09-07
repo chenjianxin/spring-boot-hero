@@ -11,6 +11,7 @@ import javax.transaction.Transactional
 @RestController
 @RequestMapping('hero')
 @Transactional
+// anyone who has logged in can access, unless specified otherwise
 @PreAuthorize('isAuthenticated()')
 class HeroController {
   @Autowired
@@ -27,18 +28,21 @@ class HeroController {
   }
 
   @PostMapping('')
+  // only admins can create users
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Hero save(@RequestBody Hero hero) {
     heroService.save(hero)
   }
 
   @PutMapping('{id}')
+  // only heroes can update their data, unless they are admins
   @PreAuthorize('hasRole("ROLE_ADMIN") or #id == principal.hero.id')
   Hero update(@RequestBody Hero hero, @PathVariable long id) {
     heroService.update(hero, id)
   }
 
   @DeleteMapping('{id}')
+  // only admins can delete users
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Hero deleteById(@PathVariable long id) {
     heroService.deleteById(id)

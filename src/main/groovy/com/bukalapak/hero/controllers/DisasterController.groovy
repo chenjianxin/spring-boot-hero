@@ -11,6 +11,7 @@ import javax.transaction.Transactional
 @RestController
 @RequestMapping('disaster')
 @Transactional
+// every user can access, unless specified otherwise
 @PreAuthorize('isAuthenticated()')
 class DisasterController {
   @Autowired
@@ -37,24 +38,28 @@ class DisasterController {
   }
 
   @PostMapping('{id}/hero/{heroId}')
-  @PreAuthorize('hasRole("ROLE_ADMIN")')
+  // only admins and hero themselves can assign hero
+  @PreAuthorize('hasRole("ROLE_ADMIN") or #heroId == principal.hero.id')
   Disaster assignHero(@PathVariable long id, @PathVariable long heroId) {
     disasterService.assignHero(id, heroId)
   }
 
   @DeleteMapping('{id}/hero/{heroId}')
-  @PreAuthorize('hasRole("ROLE_ADMIN")')
+  // only admins and hero themselves can unassign from disaster
+  @PreAuthorize('hasRole("ROLE_ADMIN") or #heroId == principal.hero.id')
   Disaster removeHero(@PathVariable long id, @PathVariable long heroId) {
     disasterService.removeHero(id, heroId)
   }
 
   @PostMapping('{id}')
+  // only admins can resolve disasters
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster resolve(@PathVariable long id) {
     disasterService.resolve(id)
   }
 
   @DeleteMapping('{id}')
+  // onlu admins can delete heroes
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster deleteById(@PathVariable long id) {
     disasterService.deleteById(id)
