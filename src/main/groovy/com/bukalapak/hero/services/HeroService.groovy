@@ -1,19 +1,17 @@
 package com.bukalapak.hero.services
 
 import com.bukalapak.hero.models.Hero
-import com.bukalapak.hero.repositories.AbilityRepository
 import com.bukalapak.hero.repositories.HeroRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 
+import javax.persistence.EntityNotFoundException
+
 @Service
 class HeroService {
   @Autowired
   HeroRepository heroRepository
-
-  @Autowired
-  AbilityRepository abilityRepository
 
   List findAll() {
     heroRepository.findAll(Sort.by('name')).asList()
@@ -23,6 +21,12 @@ class HeroService {
     heroRepository.findById(id).orElse(null)
   }
 
+  Hero findByIdOrError(long id) {
+    heroRepository.findById(id).orElseThrow({
+      new EntityNotFoundException()
+    })
+  }
+
   Hero save(Hero hero) {
     // assign hero to every abilities
     hero.abilities?.each { it.hero = hero }
@@ -30,7 +34,7 @@ class HeroService {
   }
 
   Hero update(Hero hero, long id) {
-    Hero persisted = heroRepository.findById(id).orElseThrow()
+    Hero persisted = findByIdOrError(id)
     persisted.with {
       name = hero.name
     }
@@ -54,7 +58,7 @@ class HeroService {
   }
 
   Hero deleteById(long id) {
-    def hero = findById(id)
+    def hero = findByIdOrError(id)
     heroRepository.delete(hero)
     hero
   }

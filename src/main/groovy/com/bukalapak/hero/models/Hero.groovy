@@ -23,4 +23,19 @@ class Hero {
   @ManyToMany(mappedBy = 'heroes')
   @JsonIgnore
   Set<Disaster> disasters
+
+  boolean equals(o) {
+    if (this.is(o)) return true
+    if (!(o instanceof Hero)) return false
+
+    Hero hero = (Hero) o
+
+    if (id != hero.id) return false
+
+    return true
+  }
+
+  int hashCode() {
+    return (id != null ? id.hashCode() : 0)
+  }
 }

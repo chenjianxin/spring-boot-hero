@@ -2,10 +2,11 @@ package com.bukalapak.hero.services
 
 import com.bukalapak.hero.models.Disaster
 import com.bukalapak.hero.repositories.DisasterRepository
-import com.bukalapak.hero.repositories.HeroRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+
+import javax.persistence.EntityNotFoundException
 
 @Service // register DisasterService as a Service Spring component
 class DisasterService {
@@ -13,7 +14,7 @@ class DisasterService {
   DisasterRepository disasterRepository
 
   @Autowired
-  HeroRepository heroRepository
+  HeroService heroService
 
   List findAll() {
     disasterRepository.findAll(Sort.by(Sort.Order.desc('time'))).asList()
@@ -23,28 +24,53 @@ class DisasterService {
     disasterRepository.findById(id).orElse(null)
   }
 
+  Disaster findByIdOrError(long id) {
+    disasterRepository.findById(id).orElseThrow({
+      new EntityNotFoundException()
+    })
+  }
+
   Disaster save(Disaster disaster) {
-    def heroes = []
-    // retrieve every heroes
-    disaster.heroes?.each { heroes.push(heroRepository.findById(it.id).orElseThrow()) }
-    disaster.heroes = heroes
+    disaster.isResolved = false
     disasterRepository.save(disaster)
   }
 
   Disaster update(Disaster disaster, long id) {
-    def persisted = disasterRepository.findById(id).orElseThrow()
+    def persisted = findByIdOrError(id)
     // update entity's values
     persisted.with {
       title = disaster.title
       location = disaster.location
       time = disaster.time
-      heroes = disaster.heroes
     }
     disasterRepository.save(persisted)
   }
 
+  Disaster assignHero(long id, long heroId) {
+    def disaster = findByIdOrError(id)
+    def hero = heroService.findByIdOrError(heroId)
+
+    disaster.heroes.add(hero)
+    disasterRepository.save(disaster)
+  }
+
+  Disaster removeHero(long id, long heroId) {
+    def disaster = findByIdOrError(id)
+    def hero = heroService.findByIdOrError(heroId)
+
+    disaster.heroes.remove(hero)
+    disasterRepository.save(disaster)
+  }
+
+  Disaster resolve(long id) {
+    def disaster = findByIdOrError(id)
+    disaster.isResolved = true
+
+    disasterRepository.save(disaster)
+  }
+
   Disaster deleteById(long id) {
-    def disaster = findById(id)
+    def disaster = findByIdOrError(id)
     disasterRepository.delete(disaster)
     disaster
   }
