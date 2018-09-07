@@ -5,6 +5,7 @@ import com.bukalapak.hero.models.User
 import com.bukalapak.hero.repositories.HeroRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 
 import javax.persistence.EntityNotFoundException
@@ -16,6 +17,9 @@ class HeroService {
 
   @Autowired
   RoleService roleService
+
+  @Autowired
+  PasswordEncoder passwordEncoder
 
   List findAll() {
     heroRepository.findAll(Sort.by('name')).asList()
@@ -40,6 +44,7 @@ class HeroService {
           password: '1234'
       )
     }
+    hero.user.password = passwordEncoder.encode(hero.user.password)
     hero.user.hero = hero
     // assign role to hero
     hero.user.authorities = [roleService.findByIdOrError('ROLE_HERO')]

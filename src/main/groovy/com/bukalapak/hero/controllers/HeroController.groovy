@@ -9,36 +9,36 @@ import org.springframework.web.bind.annotation.*
 import javax.transaction.Transactional
 
 @RestController
-@RequestMapping('/hero')
+@RequestMapping('hero')
 @Transactional
 @PreAuthorize('isAuthenticated()')
 class HeroController {
   @Autowired
   HeroService heroService
 
-  @GetMapping('/')
+  @GetMapping('')
   List findAll() {
     heroService.findAll()
   }
 
-  @GetMapping('/{id}')
+  @GetMapping('{id}')
   Hero findById(@PathVariable long id) {
     heroService.findById(id)
   }
 
-  @PostMapping('/')
+  @PostMapping('')
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Hero save(@RequestBody Hero hero) {
     heroService.save(hero)
   }
 
-  @PutMapping('/{id}')
-  @PreAuthorize('hasRole("ROLE_ADMIN")')
+  @PutMapping('{id}')
+  @PreAuthorize('hasRole("ROLE_ADMIN") or #id == principal.hero.id')
   Hero update(@RequestBody Hero hero, @PathVariable long id) {
     heroService.update(hero, id)
   }
 
-  @DeleteMapping('/{id}')
+  @DeleteMapping('{id}')
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Hero deleteById(@PathVariable long id) {
     heroService.deleteById(id)

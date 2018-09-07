@@ -9,51 +9,52 @@ import org.springframework.web.bind.annotation.*
 import javax.transaction.Transactional
 
 @RestController
-@RequestMapping('/disaster')
+@RequestMapping('disaster')
 @Transactional
 @PreAuthorize('isAuthenticated()')
 class DisasterController {
   @Autowired
   DisasterService disasterService
 
-  @GetMapping('/')
+  @GetMapping('')
   List findAll() {
     disasterService.findAll()
   }
 
-  @GetMapping('/{id}')
+  @GetMapping('{id}')
   Disaster findById(@PathVariable long id) {
     disasterService.findById(id)
   }
 
-  @PostMapping('/')
+  @PostMapping('')
   Disaster create(@RequestBody Disaster disaster) {
     disasterService.save(disaster)
   }
 
-  @PutMapping('/{id}')
+  @PutMapping('{id}')
   Disaster update(@RequestBody Disaster disaster, @PathVariable long id) {
     disasterService.update(disaster, id)
   }
 
-  @PostMapping('/{id}/hero/{heroId}')
+  @PostMapping('{id}/hero/{heroId}')
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster assignHero(@PathVariable long id, @PathVariable long heroId) {
     disasterService.assignHero(id, heroId)
   }
 
-  @DeleteMapping('/{id}/hero/{heroId}')
+  @DeleteMapping('{id}/hero/{heroId}')
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster removeHero(@PathVariable long id, @PathVariable long heroId) {
     disasterService.removeHero(id, heroId)
   }
 
   @PostMapping('{id}')
+  @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster resolve(@PathVariable long id) {
     disasterService.resolve(id)
   }
 
-  @DeleteMapping('/{id}')
+  @DeleteMapping('{id}')
   @PreAuthorize('hasRole("ROLE_ADMIN")')
   Disaster deleteById(@PathVariable long id) {
     disasterService.deleteById(id)

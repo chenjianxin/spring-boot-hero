@@ -29,7 +29,6 @@ class Hero {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       mappedBy = 'hero')
-  @JsonIgnore
   User user
 
   boolean equals(o) {

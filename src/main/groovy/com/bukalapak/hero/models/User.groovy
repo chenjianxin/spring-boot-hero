@@ -1,5 +1,6 @@
 package com.bukalapak.hero.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.springframework.security.core.userdetails.UserDetails
 
 import javax.persistence.*
@@ -19,10 +20,11 @@ class User implements UserDetails {
 
   boolean credentialsNonExpired = true
 
-  @OneToOne
+  @OneToOne(orphanRemoval = true)
+  @JsonIgnore
   Hero hero
 
-  @ManyToMany
+  @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = 'user_role',
       joinColumns = @JoinColumn(name = 'username'),

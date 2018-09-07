@@ -22,7 +22,7 @@ class UserController {
   }
 
   @GetMapping('{id}')
-  @PreAuthorize('isAuthenticated()')
+  @PreAuthorize('hasRole("ROLE_ADMIN") or #id == principal.username')
   User findById(@PathVariable String id) {
     userService.findById(id)
   }
@@ -34,7 +34,7 @@ class UserController {
   }
 
   @PutMapping('{id}/password')
-  @PreAuthorize('isAuthenticated()')
+  @PreAuthorize('#id == principal.username')
   User updatePassword(
       @PathVariable String id,
       @RequestBody(required = true) String password) {
