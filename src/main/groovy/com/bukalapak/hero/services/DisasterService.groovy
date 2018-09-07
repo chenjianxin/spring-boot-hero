@@ -31,7 +31,6 @@ class DisasterService {
   }
 
   Disaster save(Disaster disaster) {
-    disaster.isResolved = false
     disasterRepository.save(disaster)
   }
 

@@ -1,6 +1,7 @@
 package com.bukalapak.hero.services
 
 import com.bukalapak.hero.models.Hero
+import com.bukalapak.hero.models.User
 import com.bukalapak.hero.repositories.HeroRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
@@ -12,6 +13,9 @@ import javax.persistence.EntityNotFoundException
 class HeroService {
   @Autowired
   HeroRepository heroRepository
+
+  @Autowired
+  RoleService roleService
 
   List findAll() {
     heroRepository.findAll(Sort.by('name')).asList()
@@ -30,6 +34,15 @@ class HeroService {
   Hero save(Hero hero) {
     // assign hero to every abilities
     hero.abilities?.each { it.hero = hero }
+    if (hero.user == null) { // if user is not supplied, create it
+      hero.user = new User(
+          username: hero.name.toLowerCase().trim().replaceAll(' ', '-'),
+          password: '1234'
+      )
+    }
+    hero.user.hero = hero
+    // assign role to hero
+    hero.user.authorities = [roleService.findByIdOrError('ROLE_HERO')]
     heroRepository.save(hero)
   }
 

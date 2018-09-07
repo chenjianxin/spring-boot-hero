@@ -24,6 +24,14 @@ class Hero {
   @JsonIgnore
   Set<Disaster> disasters
 
+  @OneToOne(
+      fetch = FetchType.LAZY,
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      mappedBy = 'hero')
+  @JsonIgnore
+  User user
+
   boolean equals(o) {
     if (this.is(o)) return true
     if (!(o instanceof Hero)) return false
