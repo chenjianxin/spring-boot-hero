@@ -14,14 +14,12 @@ import javax.transaction.Transactional
 @Transactional
 class CustomUserDetailsService implements UserDetailsService {
   @Autowired
-  UserRepository userRepository
+  UserService userService
 
   @Override
   UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    def user = userRepository.findById(username).orElse(null)
-
+    def user = userService.findById(username)
     if (user == null) throw new UsernameNotFoundException(username)
-
     return user
   }
 }

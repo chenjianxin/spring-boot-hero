@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -20,28 +21,31 @@ import javax.transaction.Transactional
 @EnableWebSecurity
 class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Autowired
-  CustomUserDetailsService userDetailsService
+  UserDetailsService userDetailsService
 
+  // register password encoder as Bean; will be needed in several places
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder()
   }
 
+  // configure authentication manager
   @Override
   void configure(AuthenticationManagerBuilder auth) {
-    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider()
-    authenticationProvider.userDetailsService = userDetailsService
-    authenticationProvider.passwordEncoder = passwordEncoder()
-
-    auth.authenticationProvider(authenticationProvider)
+        // authenticate user by using our custom userDetailsService
+    auth.userDetailsService(userDetailsService)
+        // use registered PasswordEncoder
+        .passwordEncoder(passwordEncoder())
   }
 
+  // configure http security
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.httpBasic()
-        .and().csrf().disable()
+    http.httpBasic() // provide a basic login
+        .and().csrf().disable() // disabled CSRF
   }
 
+  // initialize users and roles
   @SuppressWarnings("GrMethodMayBeStatic")
   @Autowired
   @Transactional
