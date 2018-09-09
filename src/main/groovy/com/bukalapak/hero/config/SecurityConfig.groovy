@@ -4,10 +4,8 @@ import com.bukalapak.hero.models.Role
 import com.bukalapak.hero.models.User
 import com.bukalapak.hero.repositories.RoleRepository
 import com.bukalapak.hero.repositories.UserRepository
-import com.bukalapak.hero.services.CustomUserDetailsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity

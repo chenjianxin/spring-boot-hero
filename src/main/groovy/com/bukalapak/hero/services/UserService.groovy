@@ -52,6 +52,4 @@ class UserService {
     userRepository.delete(user)
     user
   }
-
-
 }

@@ -1,7 +1,5 @@
 package com.bukalapak.hero.services
 
-import com.bukalapak.hero.repositories.UserRepository
-import org.hibernate.Hibernate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
